@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8"> <!-- Setzt Zeichenkodierung auf UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Optimiert für mobile Geräte -->
+    <title>Spielebrowser 2025</title> <!-- Titel der Seite -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet"> <!-- Lädt Orbitron-Schrift -->
+    <link rel="stylesheet" href="src/css/styles.css"> <!-- Verknüpft CSS-Datei -->
+</head>
+<body>
+    <div class="space-bg"> <!-- Hintergrund mit Weltraum-Design -->
+        <div class="stars"></div> <!-- Container für Sterneneffekt -->
+        <div class="galaxy"> <!-- Galaxie-Animation -->
+            <div class="core"></div> <!-- Kern der Galaxie -->
+            <div class="arm arm1"></div> <!-- Galaxiearm 1 -->
+            <div class="arm arm2"></div> <!-- Galaxiearm 2 -->
+            <div class="companion"></div> <!-- Begleitobjekt -->
+        </div>
+    </div>
+
+    <div class="holo-loader" id="holoLoader"> <!-- Ladeanimation -->
+        <div class="holo-text">Initializing...</div> <!-- Text der Ladeanimation -->
+    </div>
+
+    <div class="overlay" id="overlay" onclick="gameManager.toggleMenu(true)"></div> <!-- Overlay zum Schließen des Menüs -->
+    <div id="toastContainer"></div> <!-- Container für Benachrichtigungen -->
+
+    <nav class="sliding-menu" id="sliding-menu"> <!-- Schiebe-Menü -->
+        <button class="close-menu" onclick="gameManager.toggleMenu(true)" aria-label="Close Menu">✕</button> <!-- Schließt Menü -->
+        <h2 class="menu-title neon-text">Menu</h2> <!-- Menütitel -->
+        <ul>
+            <li><button onclick="gameManager.showLeaderboard()">Leaderboard</button></li> <!-- Zeigt Bestenliste -->
+            <li><button onclick="gameManager.showMainMenu()">Main Menu</button></li> <!-- Zeigt Hauptmenü -->
+            <li><button onclick="gameManager.soundManager.toggleMusic()"><span class="icon">🔊</span> Toggle Music</button></li> <!-- Schaltet Musik ein/aus -->
+            <li>
+                <label for="language-menu">Language:</label> <!-- Sprachauswahl-Label -->
+                <select id="language-menu" onchange="gameManager.changeLanguage()"> <!-- Ändert Sprache -->
+                    <option value="de">Deutsch</option>
+                    <option value="en">English</option>
+                </select>
+            </li>
+            <li>
+                <label for="neon-color">Theme ändern:</label> <!-- Theme-Auswahl-Label -->
+                <select id="neon-color" onchange="changeNeonColor()"> <!-- Ändert Farbtheme -->
+                    <option value="cyan">Cyan</option>
+                    <option value="blue">Blau</option>
+                    <option value="green">Grün</option>
+                </select>
+            </li>
+            <li>
+                <label for="game-speed">Spielgeschwindigkeit:</label> <!-- Geschwindigkeits-Label -->
+                <select id="game-speed" onchange="changeGameSpeed()"> <!-- Ändert Spielgeschwindigkeit -->
+                    <option value="normal">Normal</option>
+                    <option value="fast">Schnell</option>
+                    <option value="slow">Langsam</option>
+                </select>
+            </li>
+            <li><button onclick="gameManager.showProfile()">Profile</button></li> <!-- Zeigt Profilseite -->
+        </ul>
+    </nav>
+
+    <button class="menu-toggle" onclick="gameManager.toggleMenu()" aria-label="Open Menu">☰</button> <!-- Öffnet Menü -->
+
+    <div class="analog-clock-container"> <!-- Container für analoge Uhr -->
+        <div class="analog-clock" id="analogClock"> <!-- Analoge Uhr -->
+            <div class="clock-face"> <!-- Zifferblatt -->
+                <div class="numbers"> <!-- Zahlen 1-12 -->
+                    <div class="number number-1"><span>1</span></div>
+                    <div class="number number-2"><span>2</span></div>
+                    <div class="number number-3"><span>3</span></div>
+                    <div class="number number-4"><span>4</span></div>
+                    <div class="number number-5"><span>5</span></div>
+                    <div class="number number-6"><span>6</span></div>
+                    <div class="number number-7"><span>7</span></div>
+                    <div class="number number-8"><span>8</span></div>
+                    <div class="number number-9"><span>9</span></div>
+                    <div class="number number-10"><span>10</span></div>
+                    <div class="number number-11"><span>11</span></div>
+                    <div class="number number-12"><span>12</span></div>
+                </div>
+                <div class="hand hour-hand"></div> <!-- StundenZeiger -->
+                <div class="hand minute-hand"></div> <!-- MinutenZeiger -->
+                <div class="hand second-hand"></div> <!-- SekundenZeiger -->
+                <div class="center-dot"></div> <!-- Mittelpunkt -->
+            </div>
+        </div>
+        <div class="digital-clock-box"> <!-- Digitale Uhr -->
+            <div class="clock-time" id="clockTime"></div> <!-- Zeitanzeige -->
+        </div>
+    </div>
+
+    <main class="theme-dark"> <!-- Hauptbereich mit dunklem Theme -->
+        <section id="menu-screen" class="container"> <!-- Hauptmenü -->
+            <h1 id="menu-title" class="neon-text">Spielebrowser</h1> <!-- Titel -->
+            <div class="game-selection"> <!-- Spielauswahl -->
+                <button class="neon-button-game" data-game="tictactoe">Tic Tac Toe</button> <!-- Startet Tic Tac Toe -->
+                <button class="neon-button-game" data-game="connect4">Connect Four</button> <!-- Startet Connect Four -->
+                <button class="neon-button-game" data-game="tetris">Tetris</button> <!-- Startet Tetris -->
+                <button class="neon-button-game" data-game="snake">Snake</button> <!-- Startet Snake -->
+                <button class="neon-button-game" data-game="memory">Memory</button> <!-- Startet Memory -->
+            </div>
+        </section>
+        
+        <section id="tictactoe-start-screen" class="container hidden"> <!-- Tic Tac Toe Startbildschirm -->
+            <h1 id="ttt-title" class="neon-text">Tic Tac Toe</h1> <!-- Titel -->
+            <div class="ttt-start-form"> <!-- Formular für Spieler-Einstellungen -->
+                <div class="player-input-group"> <!-- Spieler X Eingabe -->
+                    <input type="text" id="playerX" placeholder="Player X Name">
+                    <select id="symbolX"> <!-- Symbolauswahl X -->
+                        <option value="X">X</option>
+                        <option value="★">★</option>
+                    </select>
+                </div>
+                <div class="player-input-group"> <!-- Spieler O Eingabe -->
+                    <input type="text" id="playerO" placeholder="Player O Name">
+                    <select id="symbolO"> <!-- Symbolauswahl O -->
+                        <option value="O">O</option>
+                        <option value="♥">♥</option>
+                    </select>
+                </div>
+                <div class="settings-group"> <!-- Spieleinstellungen -->
+                    <div class="select-wrapper">
+                        <label for="game-mode">Game Mode:</label>
+                        <select id="game-mode" onchange="gameManager.togglePlayerOInput()"> <!-- Spielmodus -->
+                            <option value="human">Against Human</option>
+                            <option value="bot">Against Bot</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper difficulty-select" hidden> <!-- Schwierigkeitsgrad -->
+                        <label for="difficulty">Difficulty:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="impossible">Impossible</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper">
+                        <label for="best-of">Best of:</label>
+                        <select id="best-of"> <!-- Rundenanzahl -->
+                            <option value="1">1</option>
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="neon-button-start" onclick="gameManager.startTicTacToe()">Start Game</button> <!-- Startet Spiel -->
+            </div>
+        </section>
+
+        <section id="tictactoe-game-screen" class="container hidden"> <!-- Tic Tac Toe Spielbildschirm -->
+            <h1 class="neon-text">Tic Tac Toe</h1> <!-- Titel -->
+            <div class="game-wrapper">
+                <div class="game-content">
+                    <div class="status-text" id="status"></div> <!-- Statusanzeige -->
+                    <div class="board" id="ttt-board"></div> <!-- Spielbrett -->
+                    <div class="button-group">
+                        <button class="neon-button" onclick="gameManager.currentGame.resetGame()">Restart</button> <!-- Neustart -->
+                        <button class="neon-button" onclick="gameManager.currentGame.undoMove()">Undo</button> <!-- Rückgängig -->
+                        <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+                    </div>
+                </div>
+                <aside class="sidebar"> <!-- Seitenleiste -->
+                    <h2 class="sidebar-title">Game Info</h2> <!-- Titel -->
+                    <div class="sidebar-content">
+                        <div class="scoreboard"> <!-- Punktestand -->
+                            <span id="playerXName"></span>: <span id="scoreX">0</span><br>
+                            <span id="playerOName"></span>: <span id="scoreO">0</span>
+                        </div>
+                        <div class="timer"> <!-- Zeit -->
+                            Time <span id="playerXNameTimer"></span>: <span id="timerX">0</span>s<br>
+                            Time <span id="playerONameTimer"></span>: <span id="timerO">0</span>s
+                        </div>
+                        <div class="round-info"> <!-- Rundeninfo -->
+                            Round: <span id="current-round">1</span> / <span id="total-rounds">3</span>
+                        </div>
+                        <div class="history" id="move-history"></div> <!-- Zugverlauf -->
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="tictactoe-stats-screen" class="container hidden"> <!-- Tic Tac Toe Statistik -->
+            <h1 class="neon-text">Statistics</h1> <!-- Titel -->
+            <div id="ttt-stats-content"></div> <!-- Statistikinhalt -->
+            <div class="button-group">
+                <button class="neon-button" onclick="gameManager.exportTicTacToeStats()">Export Stats</button> <!-- Exportiert Statistiken -->
+                <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+            </div>
+        </section>
+
+        <section id="connect4-screen" class="container hidden"> <!-- Connect Four Spielbildschirm -->
+            <h1 class="neon-text">Connect Four</h1> <!-- Titel -->
+            <div class="game-wrapper">
+                <div class="game-content">
+                    <div class="c4-container">
+                        <div class="status-text" id="c4-status"></div> <!-- Statusanzeige -->
+                        <div class="board" id="c4-board"></div> <!-- Spielbrett -->
+                    </div>
+                    <div class="button-group">
+                        <button class="neon-button" onclick="gameManager.currentGame.resetGame()">Restart</button> <!-- Neustart -->
+                        <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+                    </div>
+                </div>
+                <aside class="sidebar"> <!-- Seitenleiste -->
+                    <h2 class="sidebar-title">Game Info</h2> <!-- Titel -->
+                    <div class="sidebar-content">
+                        <div class="scoreboard"> <!-- Punktestand -->
+                            Red: <span id="c4-score-red">0</span><br>
+                            Yellow: <span id="c4-score-yellow">0</span>
+                        </div>
+                        <div class="timer"> <!-- Zeit -->
+                            Time Red: <span id="c4-timer-red">0</span>s<br>
+                            Time Yellow: <span id="c4-timer-yellow">0</span>s
+                        </div>
+                        <div class="round-info"> <!-- Rundeninfo -->
+                            Round: <span id="c4-round">1</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="tetris-screen" class="container hidden"> <!-- Tetris Spielbildschirm -->
+            <h1 class="neon-text">Tetris</h1> <!-- Titel -->
+            <div class="tetris-wrapper">
+                <div class="game-content">
+                    <div class="tetris-board" id="tetris-board"></div> <!-- Spielbrett -->
+                </div>
+                <aside class="sidebar"> <!-- Seitenleiste -->
+                    <h2 class="sidebar-title">Game Info</h2> <!-- Titel -->
+                    <div class="sidebar-content">
+                        <div class="tetris-info">
+                            <div class="status-text" id="tetris-status"></div> <!-- Statusanzeige -->
+                            <p>Score: <span id="tetris-score">0</span></p> <!-- Punktestand -->
+                            <p>Level: <span id="tetris-level">1</span></p> <!-- Level -->
+                            <p>Highscore: <span id="tetris-highscore">0</span></p> <!-- Highscore -->
+                            <div class="next-piece-container"> <!-- Nächstes Teil -->
+                                <h3>Next Piece</h3>
+                                <div class="next-piece-board" id="next-piece-board"></div>
+                            </div>
+                            <div class="button-group">
+                                <button class="neon-button" onclick="gameManager.currentGame.startGame()">Start</button> <!-- Startet Spiel -->
+                                <button class="neon-button" onclick="gameManager.currentGame.resetGame()">Restart</button> <!-- Neustart -->
+                                <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="snake-screen" class="container hidden"> <!-- Snake Spielbildschirm -->
+            <h1 class="neon-text">Snake</h1> <!-- Titel -->
+            <div class="game-wrapper">
+                <div class="game-content">
+                    <canvas id="snake-board" width="400" height="400"></canvas> <!-- Spielbrett -->
+                    <div class="button-group">
+                        <button class="neon-button" onclick="gameManager.currentGame.startGame()">Start</button> <!-- Startet Spiel -->
+                        <button class="neon-button" onclick="gameManager.currentGame.resetGame()">Restart</button> <!-- Neustart -->
+                        <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+                    </div>
+                </div>
+                <aside class="sidebar"> <!-- Seitenleiste -->
+                    <h2 class="sidebar-title">Game Info</h2> <!-- Titel -->
+                    <div class="sidebar-content">
+                        <div class="scoreboard"> <!-- Punktestand -->
+                            Score: <span id="snake-score">0</span>
+                        </div>
+                        <div class="timer"> <!-- Zeit -->
+                            Time: <span id="snake-time">0</span>s
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="memory-screen" class="container hidden"> <!-- Memory Spielbildschirm -->
+            <h1 class="neon-text">Memory</h1> <!-- Titel -->
+            <div class="game-wrapper">
+                <div class="game-content">
+                    <div class="memory-board" id="memory-board"></div> <!-- Spielbrett -->
+                    <div class="button-group">
+                        <button class="neon-button" onclick="gameManager.currentGame.startGame()">Start</button> <!-- Startet Spiel -->
+                        <button class="neon-button" onclick="gameManager.currentGame.resetGame()">Restart</button> <!-- Neustart -->
+                        <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+                    </div>
+                </div>
+                <aside class="sidebar"> <!-- Seitenleiste -->
+                    <h2 class="sidebar-title">Game Info</h2> <!-- Titel -->
+                    <div class="sidebar-content">
+                        <div class="scoreboard"> <!-- Punktestand -->
+                            Pairs: <span id="memory-pairs">0</span>
+                        </div>
+                        <div class="timer"> <!-- Zeit -->
+                            Time: <span id="memory-time">0</span>s
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="leaderboard-screen" class="container hidden"> <!-- Bestenliste -->
+            <h1 class="neon-text">Leaderboard</h1> <!-- Titel -->
+            <div id="leaderboard-content">
+                <table class="leaderboard-table"> <!-- Tabelle -->
+                    <thead>
+                        <tr>
+                            <th>Spieler</th> <!-- Spaltenüberschrift Spieler -->
+                            <th>Spiel</th> <!-- Spaltenüberschrift Spiel -->
+                            <th>Punkte</th> <!-- Spaltenüberschrift Punkte -->
+                            <th>Datum</th> <!-- Spaltenüberschrift Datum -->
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-entries"></tbody> <!-- Einträge -->
+                </table>
+            </div>
+            <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+            <button class="neon-button" onclick="gameManager.resetLeaderboard()">Leaderboard zurücksetzen</button> <!-- Setzt Bestenliste zurück -->
+        </section>
+
+        <section id="profile-screen" class="container hidden"> <!-- Profilseite -->
+            <h1 class="neon-text">Profile</h1> <!-- Titel -->
+            <div id="profile-content">
+                <div class="profile-form"> <!-- Profilformular -->
+                    <input type="text" id="profile-name" placeholder="Name" required> <!-- Name -->
+                    <input type="number" id="profile-age" placeholder="Alter" required> <!-- Alter -->
+                    <button class="neon-button" onclick="gameManager.createProfile()">Profil erstellen</button> <!-- Erstellt Profil -->
+                </div>
+                <div id="profiles-list" class="profiles-list"></div> <!-- Profilübersicht -->
+            </div>
+            <button class="neon-button" onclick="gameManager.showMainMenu()">Main Menu</button> <!-- Zum Hauptmenü -->
+        </section>
+    </main>
+
+    <div class="chat-widget" id="chatWidget"> <!-- Chat-Widget -->
+        <button class="chat-toggle" onclick="toggleChat()">💬</button> <!-- Öffnet/Schließt Chat -->
+        <div class="chat-content" id="chatContent"> <!-- Chat-Inhalt -->
+            <div class="chat-messages" id="chatMessages"></div> <!-- Nachrichten -->
+            <input type="text" id="chatInput" placeholder="Enter message..." onkeypress="if(event.key === 'Enter') sendChat()"> <!-- Eingabe -->
+        </div>
+    </div>
+
+    <script src="src/js/utils.js"></script> <!-- Lädt Hilfsfunktionen -->
+    <script src="src/js/games/ticTacToe.js"></script> <!-- Lädt Tic Tac Toe -->
+    <script src="src/js/games/connectFour.js"></script> <!-- Lädt Connect Four -->
+    <script src="src/js/games/tetris.js"></script> <!-- Lädt Tetris -->
+    <script src="src/js/games/snake.js"></script> <!-- Lädt Snake -->
+    <script src="src/js/games/memory.js"></script> <!-- Lädt Memory -->
+    <script src="src/js/script.js"></script> <!-- Lädt Hauptlogik -->
+</body>
+</html>

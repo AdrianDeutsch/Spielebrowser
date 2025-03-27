@@ -1,0 +1,1270 @@
+* { /* Grundlegende Reset-Regeln */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar, .chat-messages, #ttt-board, #c4-board, #tetris-board, #memory-board, #snake-board { /* Scrollbalken ausblenden */
+    scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar, 
+.chat-messages::-webkit-scrollbar, 
+#ttt-board::-webkit-scrollbar, 
+#c4-board::-webkit-scrollbar, 
+#tetris-board::-webkit-scrollbar, 
+#memory-board::-webkit-scrollbar, 
+#snake-board::-webkit-scrollbar {
+    display: none;
+}
+
+:root { /* Globale Farbvariablen */
+    --primary-color: #00ffff;
+    --secondary-color: #1e90ff;
+    --accent-color: #4682b4;
+    --dark-bg: #0a0a1a;
+    --light-bg: #1a2a3a;
+    --dark-text: #b0c4de;
+    --light-text: #000;
+    --x-color: #ff0000;
+    --o-color: #0000ff;
+    --neon-glow: 0 0 12px rgba(0, 255, 255, 0.8), 0 0 24px rgba(0, 255, 255, 0.5);
+    --board-glow: 0 0 20px rgba(0, 255, 255, 0.3);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    --cell-border: #ffffff22;
+    --tetris-block-glow: 0 0 15px rgba(30, 144, 255, 0.8), 0 0 30px rgba(30, 144, 255, 0.5);
+    --success-color: #00ff00;
+}
+
+body { /* Grundstil für den Body */
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    overflow: hidden;
+    background: radial-gradient(circle at 20% 30%, #0a1a2a 0%, #000 70%, #000 100%);
+}
+
+.space-bg { /* Weltraum-Hintergrund */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.space-bg::before { /* Nebel-Effekt */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 70% 40%, rgba(0, 255, 255, 0.1), transparent 50%),
+                radial-gradient(circle at 30% 60%, rgba(30, 144, 255, 0.1), transparent 50%);
+    z-index: -1;
+}
+
+.space-bg::after { /* Planet */
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #1e90ff, #000);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(30, 144, 255, 0.5);
+    z-index: -1;
+}
+
+.stars { /* Sternenfeld */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.star { /* Einzelner Stern */
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: fall linear infinite;
+}
+
+.star:nth-child(odd) {
+    width: 1px;
+    height: 1px;
+    animation-duration: 10s;
+}
+
+.star:nth-child(even) {
+    width: 2px;
+    height: 2px;
+    animation-duration: 15s;
+}
+
+.star:nth-child(3n) {
+    width: 3px;
+    height: 3px;
+    animation-duration: 20s;
+}
+
+@keyframes fall { /* Animation für fallende Sterne */
+    0% { transform: translateY(-10vh) translateX(-50vw); opacity: 1; }
+    100% { transform: translateY(110vh) translateX(50vw); opacity: 0; }
+}
+
+.galaxy { /* Galaxie-Animation */
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 450px);
+    transform: translate(0, -50%);
+    width: 300px;
+    height: 300px;
+    animation: rotateGalaxy 60s linear infinite;
+    z-index: 1;
+}
+
+.core { /* Galaxie-Kern */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #fff, #1e90ff);
+    border-radius: 50%;
+    box-shadow: 0 0 40px #1e90ff;
+    transform: translate(-50%, -50%);
+}
+
+.arm { /* Galaxie-Arm */
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid transparent;
+    border-top-color: rgba(30, 144, 255, 0.8);
+    border-radius: 50%;
+    animation: rotateArm 20s linear infinite;
+}
+
+.arm1 {
+    top: 75px;
+    left: 75px;
+    transform: rotate(0deg);
+}
+
+.arm2 {
+    top: 75px;
+    left: 75px;
+    transform: rotate(180deg);
+}
+
+.companion { /* Galaxie-Begleiter */
+    position: absolute;
+    top: 225px;
+    left: 300px;
+    width: 40px;
+    height: 15px;
+    background: radial-gradient(ellipse, #1e90ff, transparent);
+    transform: rotate(45deg);
+}
+
+@keyframes rotateGalaxy { /* Rotation der Galaxie */
+    from { transform: translate(0, -50%) rotate(0deg); }
+    to { transform: translate(0, -50%) rotate(360deg); }
+}
+
+@keyframes rotateArm { /* Rotation der Arme */
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.holo-loader { /* Ladeanimation */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeOutLoader 2s forwards 1s;
+}
+
+.holo-text { /* Text der Ladeanimation */
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-shadow: var(--neon-glow);
+    animation: pulseHolo 1s infinite;
+}
+
+@keyframes pulseHolo { /* Pulsanimation für Text */
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes fadeOutLoader { /* Ausblenden der Ladeanimation */
+    0% { opacity: 1; }
+    100% { opacity: 0; pointer-events: none; }
+}
+
+.theme-dark { /* Dunkles Theme */
+    background: transparent;
+    color: var(--dark-text);
+}
+
+.overlay { /* Overlay für Menü */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 999;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sliding-menu { /* Schiebe-Menü */
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(10, 10, 26, 0.9), rgba(26, 42, 58, 0.9));
+    backdrop-filter: blur(10px);
+    padding: 60px 30px;
+    transition: left 0.5s ease-in-out;
+    z-index: 1000;
+    border-radius: 0 30px 30px 0;
+    box-shadow: var(--shadow);
+}
+
+.sliding-menu.active {
+    left: 0;
+}
+
+.sliding-menu .menu-title { /* Menütitel */
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: var(--neon-glow);
+    animation: glowPulse 2s infinite ease-in-out;
+}
+
+@keyframes glowPulse { /* Neon-Pulsanimation */
+    0%, 100% { text-shadow: var(--neon-glow); }
+    50% { text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color); }
+}
+
+.sliding-menu ul { /* Menüliste */
+    list-style: none;
+    padding: 0;
+}
+
+.sliding-menu li { /* Menüpunkt */
+    margin: 25px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.5s ease;
+}
+
+.sliding-menu.active li {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.sliding-menu li:nth-child(1) { transition-delay: 0.1s; }
+.sliding-menu li:nth-child(2) { transition-delay: 0.2s; }
+.sliding-menu li:nth-child(3) { transition-delay: 0.3s; }
+.sliding-menu li:nth-child(4) { transition-delay: 0.4s; }
+.sliding-menu li:nth-child(5) { transition-delay: 0.5s; }
+.sliding-menu li:nth-child(6) { transition-delay: 0.6s; }
+.sliding-menu li:nth-child(7) { transition-delay: 0.7s; }
+
+.sliding-menu button, .sliding-menu select { /* Menü-Buttons und Auswahlfelder */
+    width: 90%;
+    padding: 15px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--primary-color);
+    color: var(--dark-text);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.sliding-menu button:hover, .sliding-menu select:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    box-shadow: var(--neon-glow);
+}
+
+.sliding-menu .icon { /* Icon im Menü */
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.sliding-menu label { /* Label im Menü */
+    color: var(--dark-text);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.close-menu { /* Schließen-Button im Menü */
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: transparent;
+    border: 2px solid var(--secondary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-menu:hover {
+    background: var(--secondary-color);
+    color: var(--dark-bg);
+    transform: rotate(90deg);
+    box-shadow: 0 0 20px var(--secondary-color);
+}
+
+.menu-toggle { /* Menü-Öffnen-Button */
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    padding: 12px 16px;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    box-shadow: var(--neon-glow);
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px var(--secondary-color);
+}
+
+.container { /* Hauptcontainer für Inhalte */
+    padding: 40px;
+    background: rgba(10, 10, 26, 0.85);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    width: 900px;
+    max-width: 95%;
+    text-align: center;
+    transition: all 0.5s ease;
+    min-height: 650px;
+    margin: 120px auto;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 2;
+}
+
+.hidden { /* Versteckte Elemente */
+    display: none;
+    opacity: 0;
+}
+
+.neon-text { /* Neon-Textstil */
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: var(--neon-glow);
+    animation: glowPulse 2s infinite ease-in-out;
+}
+
+.game-selection { /* Spielauswahl-Bereich */
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.neon-button-game { /* Spielauswahl-Buttons */
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    padding: 20px 60px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    border-radius: 50px;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    width: 80%;
+    max-width: 400px;
+    animation: slideInGame 0.5s ease forwards;
+}
+
+.neon-button-game:nth-child(1) { animation-delay: 0.1s; }
+.neon-button-game:nth-child(2) { animation-delay: 0.2s; }
+.neon-button-game:nth-child(3) { animation-delay: 0.3s; }
+.neon-button-game:nth-child(4) { animation-delay: 0.4s; }
+.neon-button-game:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInGame { /* Einblendeanimation für Spielbuttons */
+    0% { transform: translateY(50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.neon-button-game:hover {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+    box-shadow: var(--neon-glow);
+    transform: scale(1.05);
+}
+
+.neon-button-game::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.5s;
+}
+
+.neon-button-game:hover::before {
+    left: 100%;
+}
+
+.ttt-start-form { /* Tic Tac Toe Startformular */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    margin-top: 40px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.player-input-group { /* Spielereingabe-Gruppe */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.player-input-group:nth-child(1) { animation-delay: 0.1s; }
+.player-input-group:nth-child(2) { animation-delay: 0.2s; }
+
+@keyframes fadeInUp { /* Einblendeanimation von unten */
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.player-input-group input, .player-input-group select { /* Eingabefelder und Auswahlfelder */
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+    transition: all 0.3s ease;
+    flex: 1;
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.player-input-group input:focus, .player-input-group select:focus {
+    outline: none;
+    box-shadow: var(--neon-glow);
+    transform: translateY(-2px);
+}
+
+.settings-group { /* Einstellungsgruppe */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.select-wrapper { /* Auswahl-Wrapper */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.select-wrapper:nth-child(1) { animation-delay: 0.3s; }
+.select-wrapper:nth-child(2) { animation-delay: 0.4s; }
+.select-wrapper:nth-child(3) { animation-delay: 0.5s; }
+
+.select-wrapper label { /* Label für Auswahl */
+    color: var(--dark-text);
+    font-size: 1.1rem;
+}
+
+.select-wrapper select { /* Auswahlfeld */
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+    transition: all 0.3s ease;
+    flex: 1;
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.select-wrapper select:focus {
+    outline: none;
+    box-shadow: var(--neon-glow);
+}
+
+.neon-button-start { /* Start-Button */
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    padding: 15px 50px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50px;
+    color: var(--dark-bg);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--neon-glow);
+    animation: fadeInUp 0.5s ease forwards 0.6s;
+}
+
+.neon-button-start:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px var(--primary-color);
+}
+
+.game-wrapper { /* Spielbereich-Wrapper */
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.game-content { /* Spielinhalt */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.status-text { /* Statusanzeige */
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--secondary-color);
+}
+
+.board { /* Spielbrett */
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: var(--board-glow);
+}
+
+.cell { /* Einzelne Zelle */
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cell-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 10px;
+}
+
+.cell:hover:not(.X):not(.O):not(.winning-cell) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cell.X { /* X-Zelle */
+    color: var(--x-color);
+    text-shadow: 0 0 15px var(--x-color);
+}
+
+.cell.O { /* O-Zelle */
+    color: var(--o-color);
+    text-shadow: 0 0 15px var(--o-color);
+}
+
+.cell.reveal { /* Enthüllungsanimation */
+    animation: revealSymbol 0.5s ease forwards;
+}
+
+@keyframes revealSymbol {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.winning-cell { /* Gewinnzelle */
+    background: rgba(0, 255, 0, 0.3);
+    animation: pulseWin 1s infinite;
+}
+
+@keyframes pulseWin { /* Pulsanimation für Gewinn */
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.button-group { /* Button-Gruppe */
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.neon-button { /* Neon-Button */
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 50px;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.neon-button:hover {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+    box-shadow: var(--neon-glow);
+    transform: translateY(-3px);
+}
+
+.neon-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.5s;
+}
+
+.neon-button:hover::before {
+    left: 100%;
+}
+
+.sidebar { /* Seitenleiste */
+    width: 300px;
+    background: rgba(26, 42, 58, 0.5);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    text-align: left;
+    overflow-y: auto;
+}
+
+.sidebar-title { /* Titel der Seitenleiste */
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--accent-color);
+}
+
+.sidebar-content { /* Inhalt der Seitenleiste */
+    font-size: 1.1rem;
+    color: var(--dark-text);
+}
+
+.scoreboard, .timer, .round-info, .history { /* Abschnitte der Seitenleiste */
+    margin-bottom: 15px;
+}
+
+#ttt-stats-content { /* Statistikinhalt */
+    font-size: 1.2rem;
+    margin: 30px 0;
+    color: var(--dark-text);
+}
+
+.c4-container { /* Connect Four Container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#c4-board { /* Connect Four Brett */
+    display: grid;
+    grid-template-columns: repeat(7, 70px);
+    grid-template-rows: repeat(6, 70px);
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: var(--board-glow);
+}
+
+#c4-board .cell { /* Connect Four Zelle */
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+#c4-board .cell.red { /* Rote Zelle */
+    background: radial-gradient(circle, #ff4500, #e41b00);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px #ff4500;
+    animation: dropPiece 0.5s ease;
+}
+
+#c4-board .cell.yellow { /* Gelbe Zelle */
+    background: radial-gradient(circle, #ffd700, #e6b800);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px #ffd700;
+    animation: dropPiece 0.5s ease;
+}
+
+@keyframes dropPiece { /* Fallanimation */
+    0% { transform: translateY(-500px); }
+    100% { transform: translateY(0); }
+}
+
+.tetris-wrapper { /* Tetris-Wrapper */
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+}
+
+#tetris-board { /* Tetris-Brett */
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(20, 30px);
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: var(--board-glow);
+}
+
+.tetris-block { /* Tetris-Block */
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cell-border);
+}
+
+.tetris-block.filled { /* Gefüllter Tetris-Block */
+    background: var(--secondary-color);
+    box-shadow: var(--tetris-block-glow);
+}
+
+.next-piece-container { /* Nächstes Teil Container */
+    margin-top: 20px;
+}
+
+.next-piece-board { /* Nächstes Teil Brett */
+    display: grid;
+    grid-template-columns: repeat(4, 25px);
+    grid-template-rows: repeat(2, 25px);
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.next-piece-board .tetris-block { /* Nächstes Teil Block */
+    width: 25px;
+    height: 25px;
+}
+
+.tetris-info p { /* Tetris-Info Text */
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+#snake-board { /* Snake-Brett */
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    box-shadow: var(--board-glow);
+}
+
+#memory-board { /* Memory-Brett */
+    display: grid;
+    grid-template-columns: repeat(4, 80px);
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: var(--board-glow);
+}
+
+.memory-card { /* Memory-Karte */
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.memory-card:hover:not(.flipped):not(.matched) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.memory-card.flipped, .memory-card.matched { /* Gedrehte oder passende Karte */
+    background: var(--primary-color);
+    color: var(--dark-bg);
+}
+
+.memory-card.matched { /* Passende Karte */
+    background: var(--success-color);
+    box-shadow: 0 0 15px var(--success-color);
+}
+
+.analog-clock-container { /* Analoge Uhr Container */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.analog-clock { /* Analoge Uhr */
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--primary-color);
+}
+
+.clock-face { /* Zifferblatt */
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.numbers { /* Zahlen auf der Uhr */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.number { /* Einzelne Zahl */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.number span {
+    display: block;
+    transform: translateY(-20px);
+}
+
+.number-1 { transform: rotate(30deg); }
+.number-2 { transform: rotate(60deg); }
+.number-3 { transform: rotate(90deg); }
+.number-4 { transform: rotate(120deg); }
+.number-5 { transform: rotate(150deg); }
+.number-6 { transform: rotate(180deg); }
+.number-7 { transform: rotate(210deg); }
+.number-8 { transform: rotate(240deg); }
+.number-9 { transform: rotate(270deg); }
+.number-10 { transform: rotate(300deg); }
+.number-11 { transform: rotate(330deg); }
+.number-12 { transform: rotate(0deg); }
+
+.hand { /* Zeiger */
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom;
+    background: var(--primary-color);
+    border-radius: 5px;
+    transition: transform 0.1s ease;
+}
+
+.hour-hand { /* Stundenzeiger */
+    width: 4px;
+    height: 40px;
+}
+
+.minute-hand { /* Minutenzeiger */
+    width: 3px;
+    height: 60px;
+}
+
+.second-hand { /* Sekundenzeiger */
+    width: 2px;
+    height: 70px;
+    background: var(--secondary-color);
+}
+
+.center-dot { /* Mittelpunkt der Uhr */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.digital-clock-box { /* Digitale Uhr */
+    text-align: center;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    color: var(--primary-color);
+    font-size: 1rem;
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+#toastContainer { /* Benachrichtigungscontainer */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast { /* Benachrichtigung */
+    background: rgba(0, 255, 255, 0.8);
+    color: var(--dark-bg);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 1rem;
+    box-shadow: var(--neon-glow);
+    animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease 2.5s forwards;
+}
+
+.toast.error { background: rgba(255, 0, 0, 0.8); }
+.toast.success { background: rgba(0, 255, 0, 0.8); }
+
+@keyframes slideIn { /* Einblendeanimation */
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut { /* Ausblendeanimation */
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.chat-widget { /* Chat-Widget */
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.chat-toggle { /* Chat-Schalter */
+    background: var(--primary-color);
+    border: none;
+    padding: 10px;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--neon-glow);
+    transition: all 0.3s ease;
+}
+
+.chat-toggle:hover {
+    transform: scale(1.1);
+}
+
+.chat-content { /* Chat-Inhalt */
+    display: none;
+    width: 300px;
+    height: 400px;
+    background: rgba(10, 10, 26, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    flex-direction: column;
+}
+
+.chat-content.active {
+    display: flex;
+}
+
+.chat-messages { /* Chat-Nachrichten */
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    color: var(--dark-text);
+}
+
+.chat-messages p {
+    margin: 5px 0;
+}
+
+#chatInput { /* Chat-Eingabe */
+    padding: 10px;
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+    width: 100%;
+}
+
+.profile-form { /* Profilformular */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.profile-form input { /* Eingabefelder im Profil */
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text);
+    width: 100%;
+    max-width: 300px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.profile-form input:focus {
+    outline: none;
+    box-shadow: var(--neon-glow);
+    transform: translateY(-2px);
+}
+
+.profiles-list { /* Profilübersicht */
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.profile-item { /* Einzelnes Profil */
+    background: rgba(26, 42, 58, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow);
+}
+
+.profile-item p {
+    margin: 5px 0;
+    font-size: 1.1rem;
+    color: var(--dark-text);
+}
+
+.profile-item button {
+    margin-top: 10px;
+}
+
+.leaderboard-table { /* Bestenlistentabelle */
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    color: var(--dark-text);
+}
+
+.leaderboard-table th, .leaderboard-table td { /* Tabellenüberschriften und Zellen */
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.leaderboard-table th {
+    background: rgba(26, 42, 58, 0.8);
+    color: var(--primary-color);
+    text-shadow: var(--neon-glow);
+    font-size: 1.2rem;
+}
+
+.leaderboard-table td {
+    font-size: 1.1rem;
+}
+
+.leaderboard-table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease;
+}
+
+@media (max-width: 1200px) { /* Anpassungen für Bildschirme bis 1200px */
+    .galaxy {
+        left: calc(50% + 350px);
+        width: 250px;
+        height: 250px;
+    }
+
+    .core {
+        width: 60px;
+        height: 60px;
+        box-shadow: 0 0 30px #1e90ff;
+    }
+
+    .arm {
+        width: 120px;
+        height: 120px;
+    }
+
+    .arm1, .arm2 {
+        top: 65px;
+        left: 65px;
+    }
+
+    .companion {
+        top: 180px;
+        left: 240px;
+        width: 30px;
+        height: 10px;
+    }
+}
+
+@media (max-width: 768px) { /* Anpassungen für Bildschirme bis 768px */
+    .sliding-menu { width: 250px; padding: 40px 20px; }
+    .container { padding: 20px; margin: 80px auto; min-height: 500px; }
+    .neon-text { font-size: 2.5rem; }
+    .game-wrapper { flex-direction: column; gap: 20px; }
+    .sidebar { width: 100%; }
+    .board { grid-template-columns: repeat(3, 80px); }
+    .cell { width: 80px; height: 80px; font-size: 2.5rem; }
+    #c4-board { grid-template-columns: repeat(7, 50px); grid-template-rows: repeat(6, 50px); }
+    #c4-board .cell { width: 50px; height: 50px; font-size: 1.5rem; }
+    #tetris-board { grid-template-columns: repeat(10, 25px); grid-template-rows: repeat(20, 25px); }
+    .tetris-block { width: 25px; height: 25px; }
+    #memory-board { grid-template-columns: repeat(4, 60px); }
+    .memory-card { width: 60px; height: 60px; font-size: 1.5rem; }
+    .analog-clock-container { top: 10px; right: 10px; }
+    .analog-clock { width: 100px; height: 100px; }
+    .hour-hand { height: 30px; }
+    .minute-hand { height: 40px; }
+    .second-hand { height: 50px; }
+    .neon-button-game { font-size: 1.5rem; padding: 15px 40px; }
+
+    .galaxy {
+        top: 70%;
+        left: calc(50% - 125px);
+        width: 200px;
+        height: 200px;
+    }
+
+    .core {
+        width: 50px;
+        height: 50px;
+        box-shadow: 0 0 25px #1e90ff;
+    }
+
+    .arm {
+        width: 100px;
+        height: 100px;
+    }
+
+    .arm1, .arm2 {
+        top: 50px;
+        left: 50px;
+    }
+
+    .companion {
+        top: 150px;
+        left: 200px;
+        width: 25px;
+        height: 8px;
+    }
+}
+
+@media (max-width: 480px) { /* Anpassungen für Bildschirme bis 480px */
+    .neon-text { font-size: 2rem; }
+    .neon-button-game { font-size: 1.2rem; padding: 12px 30px; }
+    .board { grid-template-columns: repeat(3, 60px); }
+    .cell { width: 60px; height: 60px; font-size: 2rem; }
+
+    .galaxy {
+        top: 80%;
+        left: calc(50% - 100px);
+        width: 150px;
+        height: 150px;
+    }
+
+    .core {
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 0 20px #1e90ff;
+    }
+
+    .arm {
+        width: 80px;
+        height: 80px;
+    }
+
+    .arm1, .arm2 {
+        top: 35px;
+        left: 35px;
+    }
+
+    .companion {
+        top: 120px;
+        left: 150px;
+        width: 20px;
+        height: 6px;
+    }
+}
